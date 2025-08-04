@@ -28,48 +28,57 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
         },
       ],
     }),
-     // TypeORM 数据库模块 - 异步配置
-     TypeOrmModule.forRootAsync({
+    // TypeORM 数据库模块 - 异步配置
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: "mysql", // 改为 mysql
-        host: configService.get("DB_HOST", "localhost"),
-        port: configService.get("DB_PORT", 3306), // MySQL 默认端口 3306
-        username: configService.get("DB_USERNAME", "root"), // MySQL 默认用户名
-        password: configService.get("DB_PASSWORD", "password"),
-        database: configService.get("DB_NAME", "test"),
+      useFactory: (configService: ConfigService) => {
+        // 调试输出
+        console.log('当前DB_HOST:', configService.get('DB_HOST'));
+        console.log('所有环境变量:', configService.get('DB_'));
+        return {
+          type: 'mysql', // 改为 mysql
+          host: configService.get('DB_HOST', 'localhost'),
+          port: configService.get('DB_PORT', 3306), // MySQL 默认端口 3306
+          username: configService.get('DB_USERNAME', 'root'), // MySQL 默认用户名
+          password: configService.get('DB_PASSWORD', 'password'),
+          database: configService.get('DB_NAME', 'test'),
 
-        // 自动加载实体
-        entities: [__dirname + "/**/*.entity{.ts,.js}"],
+          // 自动加载实体
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
 
-        // 开发环境配置
-        synchronize: false, // 暂时禁用自动同步，避免重复索引错误
-        logging: configService.get("NODE_ENV") === "development", // 仅开发环境显示SQL日志
+          // 开发环境配置
+          synchronize: false, // 暂时禁用自动同步，避免重复索引错误
+          logging: configService.get('NODE_ENV') === 'development', // 仅开发环境显示SQL日志
 
-        // MySQL 特定配置
-        charset: "utf8mb4", // 支持 emoji 和完整的 UTF-8
-        timezone: "+08:00", // 设置时区为中国时区
+          // MySQL 特定配置
+          charset: 'utf8mb4', // 支持 emoji 和完整的 UTF-8
+          timezone: '+08:00', // 设置时区为中国时区
 
-        // 连接池配置
-        extra: {
-          connectionLimit: configService.get("DB_MAX_CONNECTIONS", 10), // 最大连接数
-          acquireTimeout: configService.get("DB_CONNECTION_TIMEOUT", 60000), // 连接超时
-          timeout: 60000, // 查询超时
-        },
-      }),
+          // 连接池配置
+          extra: {
+            connectionLimit: configService.get('DB_MAX_CONNECTIONS', 10), // 最大连接数
+            acquireTimeout: configService.get('DB_CONNECTION_TIMEOUT', 60000), // 连接超时
+            timeout: 60000, // 查询超时
+          },
+        };
+      },
     }),
     // 业务模块
     UsersModule, // 用户模块（必须在认证模块之前，因为认证模块依赖用户模块）
     AuthModule, // 认证模块
   ],
   controllers: [AppController],
-  providers: [AppService,{
-    provide: APP_GUARD,
-    useClass: ThrottlerGuard,
-  }, {
-    provide: APP_FILTER,
-    useClass: HttpExceptionFilter,
-  },],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

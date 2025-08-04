@@ -2,22 +2,23 @@ version: '3.8'
 
 services:
   # MySQL 数据库
-  mysql:
-    image: mysql:8.0
-    container_name: nestjs-auth-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: nestjs_auth
-      MYSQL_USER: nestjs
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    networks:
-      - nestjs-network
+  # mysql:
+  #   image: mysql:8.0
+  #   container_name: nestjs-auth-mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: test
+  #     MYSQL_USER: root
+  #     MYSQL_PASSWORD: root
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  #   networks:
+  #     - nestjs-network
+  #   restart: unless-stopped
 
   # Redis (可选，用于缓存)
   redis:
@@ -29,6 +30,7 @@ services:
       - redis_data:/data
     networks:
       - nestjs-network
+    restart: unless-stopped
 
   # NestJS 应用
   app:
@@ -36,27 +38,45 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: nestjs-auth-app
-    ports:
+    container_name: nestjs-app
+    ports:   
       - "3002:3002"
     environment:
+      # 通过环境变量传递配置（推荐方式）
       NODE_ENV: production
-      DB_HOST: mysql
+      PORT: 3002
+      # DB_HOST: mysql
+      DB_HOST: host.docker.internal
       DB_PORT: 3306
       DB_USERNAME: root
       DB_PASSWORD: root
       DB_NAME: test
+      DB_MAX_CONNECTIONS: 20
+      DB_CONNECTION_TIMEOUT: 60000
+      JWT_SECRET: your-super-secure-production-jwt-secret-change-this
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: your-super-secure-production-refresh-secret-change-this
+      JWT_REFRESH_EXPIRES_IN: 7d
+      THROTTLE_TTL: 60000
+      THROTTLE_LIMIT: 100
       REDIS_HOST: redis
       REDIS_PORT: 6379
     depends_on:
-      - mysql
+      # - mysql
       - redis
     networks:
       - nestjs-network
     restart: unless-stopped
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/api/v1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  mysql_data:
+  # mysql_data:
   redis_data:
 
 networks:

@@ -1,18 +1,9 @@
-# 构建阶段 - 使用标准 Node 镜像替代 Alpine
-FROM node:18-bullseye-slim AS builder
-
-# 1. 安装系统依赖
-RUN apt-get update && apt-get install -y \
-    openssl \
-    curl \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+# 构建阶段 - 使用最新版 Node 镜像
+FROM node:latest AS builder
 
 WORKDIR /app
 
-# 安装 pnpm
+# 确保使用最新版 pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # 拷贝依赖定义
@@ -27,8 +18,8 @@ COPY . .
 # 构建项目
 RUN pnpm build
 
-# 生产阶段 - 同样使用标准 Node 镜像
-FROM node:18-bullseye-slim
+# 生产阶段 - 命名为 production 以匹配 compose 配置
+FROM node:latest AS production
 
 WORKDIR /app
 
