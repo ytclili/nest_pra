@@ -35,7 +35,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
       useFactory: (configService: ConfigService) => {
         // 调试输出
         console.log('当前DB_HOST:', configService.get('DB_HOST'));
-        console.log('所有环境变量:', configService.get('DB_'));
+        console.log('所有环境变量:', configService.get('DB_PORT'));
         return {
           type: 'mysql', // 改为 mysql
           host: configService.get('DB_HOST', 'localhost'),
