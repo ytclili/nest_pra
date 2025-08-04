@@ -2,15 +2,15 @@ import { Controller, Post, Body, UseGuards, Request, HttpCode, HttpStatus, Get }
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger"
 import { Throttle } from "@nestjs/throttler"
 
-import type { AuthService } from "./auth.service"
+import { AuthService } from "./auth.service"
 import { JwtAuthGuard } from "./guards/jwt-auth.guard"
-import { JwtRefreshGuard } from "./guards/jwt-refresh.guard"
-import type { RegisterDto } from "./dto/register.dto"
-import type { ChangePasswordDto } from "./dto/change-password.dto"
-import type { ForgotPasswordDto } from "./dto/forgot-password.dto"
-import type { ResetPasswordDto } from "./dto/reset-password.dto"
+// import { JwtRefreshGuard } from "./guards/jwt-refresh.guard"
+import { RegisterDto } from "./dto/register.dto"
+import { ChangePasswordDto } from "./dto/change-password.dto"
+import { ForgotPasswordDto } from "./dto/forgot-password.dto"
+import { ResetPasswordDto } from "./dto/reset-password.dto"
 import { CurrentUser } from "../../common/decorators/current-user.decorator"
-import type { User } from "../users/entities/user.entity"
+import { User } from "../users/entities/user.entity"
 import { AuthResponseDto } from "./dto/auth-response.dto"
 
 /**
@@ -54,7 +54,7 @@ export class AuthController {
    * POST /auth/refresh
    * 使用刷新令牌获取新的访问令牌
    */
-  @UseGuards(JwtRefreshGuard) // 使用刷新令牌守卫
+  // @UseGuards(JwtRefreshGuard) // 使用刷新令牌守卫
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: '刷新访问令牌' })

@@ -5,20 +5,20 @@ import {
   ConflictException,
   NotFoundException,
 } from "@nestjs/common"
-import type { ConfigService } from "@nestjs/config"
-import type { Repository } from "typeorm"
+import { ConfigService } from "@nestjs/config"
+import { Repository } from "typeorm"
 import { InjectRepository } from "@nestjs/typeorm"
 import { randomBytes } from "crypto"
 
-import type { UsersService } from "../users/users.service"
-import type { TokenService } from "./services/token.service"
-import type { PasswordService } from "./services/password.service"
-import type { User } from "../users/entities/user.entity"
+import { UsersService } from "../users/users.service"
+import { TokenService } from "./services/token.service"
+import { PasswordService } from "./services/password.service"
+import { User } from "../users/entities/user.entity"
 import { RefreshToken } from "./entities/refresh-token.entity"
-import type { RegisterDto } from "./dto/register.dto"
-import type { ChangePasswordDto } from "./dto/change-password.dto"
-import type { ResetPasswordDto } from "./dto/reset-password.dto"
-import type { AuthResponseDto } from "./dto/auth-response.dto"
+import { RegisterDto } from "./dto/register.dto"
+import { ChangePasswordDto } from "./dto/change-password.dto"
+import { ResetPasswordDto } from "./dto/reset-password.dto"
+import { AuthResponseDto } from "./dto/auth-response.dto"
 import { UserRole } from "../users/enums/user-role.enum"
 
 /**
@@ -217,7 +217,11 @@ export class AuthService {
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
     // 根据重置令牌查找用户
     const user = await this.usersService.findByResetToken(resetPasswordDto.token)
-    if (!user || user.resetTokenExpiry < new Date()) {
+    if (
+      !user ||
+      !user.resetTokenExpiry ||
+      user.resetTokenExpiry < new Date()
+    ) {
       throw new BadRequestException("重置令牌无效或已过期")
     }
 

@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common"
-import type { Repository } from "typeorm"
+import { Repository } from "typeorm"
+import { InjectRepository } from "@nestjs/typeorm"
 
-import type { User } from "./entities/user.entity"
-import type { CreateUserDto } from "./dto/create-user.dto"
-import type { UpdateUserDto } from "./dto/update-user.dto"
+import { User } from "./entities/user.entity"
+import { CreateUserDto } from "./dto/create-user.dto"
+import { UpdateUserDto } from "./dto/update-user.dto"
 import { UserRole } from "./enums/user-role.enum"
 
 /**
@@ -12,7 +13,10 @@ import { UserRole } from "./enums/user-role.enum"
  */
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
+  ) {}
 
   /**
    * 创建新用户
@@ -130,7 +134,7 @@ export class UsersService {
       password: hashedPassword,
       // 密码更新后重置登录失败次数
       failedLoginAttempts: 0,
-      lockedUntil: null,
+      lockedUntil: undefined,
     })
   }
 
@@ -153,8 +157,8 @@ export class UsersService {
    */
   async clearResetToken(id: string): Promise<void> {
     await this.userRepository.update(id, {
-      resetToken: null,
-      resetTokenExpiry: null,
+      resetToken: undefined,
+      resetTokenExpiry: undefined,
     })
   }
 
@@ -178,8 +182,8 @@ export class UsersService {
   async verifyEmail(id: string): Promise<void> {
     await this.userRepository.update(id, {
       emailVerified: true,
-      emailVerificationToken: null,
-      emailVerificationExpiry: null,
+      emailVerificationToken: undefined,
+      emailVerificationExpiry: undefined,
     })
   }
 
@@ -258,7 +262,7 @@ export class UsersService {
       lastLoginAt: new Date(),
       lastLoginIp: ip,
       failedLoginAttempts: 0, // 重置失败次数
-      lockedUntil: null, // 解除锁定
+      lockedUntil: undefined, // 解除锁定
     })
   }
 

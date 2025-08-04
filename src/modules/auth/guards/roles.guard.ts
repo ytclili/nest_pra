@@ -1,7 +1,7 @@
-import { Injectable, type CanActivate, type ExecutionContext } from "@nestjs/common"
-import type { Reflector } from "@nestjs/core"
+import { Injectable,  CanActivate,  ExecutionContext } from "@nestjs/common"
+import  { Reflector } from "@nestjs/core"
 import { ROLES_KEY } from "../decorators/roles.decorator"
-import type { UserRole } from "../../users/enums/user-role.enum"
+import  { UserRole } from "../../users/enums/user-role.enum"
 
 /**
  * 角色守卫 - 基于用户角色控制访问权限

@@ -15,17 +15,17 @@ import {
 } from "@nestjs/common"
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from "@nestjs/swagger"
 
-import type { UsersService } from "./users.service"
-import type { CreateUserDto } from "./dto/create-user.dto"
-import type { UpdateUserDto } from "./dto/update-user.dto"
-import type { UpdateRoleDto } from "./dto/update-role.dto"
-import type { UpdatePermissionsDto } from "./dto/update-permissions.dto"
+import { UsersService } from "./users.service"
+import { CreateUserDto } from "./dto/create-user.dto"
+import { UpdateUserDto } from "./dto/update-user.dto"
+import { UpdateRoleDto } from "./dto/update-role.dto"
+import { UpdatePermissionsDto } from "./dto/update-permissions.dto"
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard"
 import { RolesGuard } from "../auth/guards/roles.guard"
 import { Roles } from "../auth/decorators/roles.decorator"
 import { CurrentUser } from "../../common/decorators/current-user.decorator"
 import { UserRole } from "./enums/user-role.enum"
-import type { User } from "./entities/user.entity"
+import { User } from "./entities/user.entity"
 
 /**
  * 用户控制器 - 处理用户相关的HTTP请求

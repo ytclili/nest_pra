@@ -25,6 +25,7 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
       context.getHandler(), // 方法级别的装饰器
       context.getClass(), // 类级别的装饰器
     ])
+    console.log("isPublic", isPublic)
 
     if (isPublic) {
       return true // 公开路由，直接允许访问

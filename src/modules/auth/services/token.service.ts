@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
-import type { JwtService } from "@nestjs/jwt"
-import type { ConfigService } from "@nestjs/config"
+import { JwtService } from "@nestjs/jwt"
+import { ConfigService } from "@nestjs/config"
 
 /**
  * 令牌服务 - 负责 JWT 令牌的生成、验证和解码

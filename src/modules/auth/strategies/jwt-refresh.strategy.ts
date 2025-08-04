@@ -1,10 +1,10 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common"
 import { PassportStrategy } from "@nestjs/passport"
 import { ExtractJwt, Strategy } from "passport-jwt"
-import type { ConfigService } from "@nestjs/config"
-import type { Request } from "express"
+import  { ConfigService } from "@nestjs/config"
+import  { Request } from "express"
 
-import type { UsersService } from "../../users/users.service"
+import  { UsersService } from "../../users/users.service"
 
 /**
  * JWT 刷新令牌策略 - 用于验证刷新令牌

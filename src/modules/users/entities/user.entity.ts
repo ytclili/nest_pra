@@ -10,7 +10,7 @@ import { RefreshToken } from "../../auth/entities/refresh-token.entity"
  * 包含用户的基本信息、认证信息、角色权限等
  */
 @Entity("users") // 数据库表名为 users
-@Index(["email"], { unique: true }) // 为邮箱字段创建唯一索引
+// @Index(["email"], { unique: true }) // 为邮箱字段创建唯一索引
 export class User {
   @ApiProperty({ description: "用户唯一标识符" })
   @PrimaryGeneratedColumn("uuid") // 使用 UUID 作为主键

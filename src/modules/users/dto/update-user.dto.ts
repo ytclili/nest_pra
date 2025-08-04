@@ -1,17 +1,20 @@
-import { IsEnum, IsNotEmpty } from "class-validator"
+import { PartialType } from "@nestjs/swagger"
+import { IsOptional, IsBoolean } from "class-validator"
 import { ApiProperty } from "@nestjs/swagger"
-import { UserRole } from "../enums/user-role.enum"
+import { CreateUserDto } from "./create-user.dto"
 
 /**
- * 更新用户角色数据传输对象
+ * 更新用户数据传输对象
+ * 继承自创建用户DTO，所有字段都是可选的
  */
-export class UpdateRoleDto {
-  @ApiProperty({
-    example: UserRole.ADMIN,
-    description: "新的用户角色",
-    enum: UserRole,
-  })
-  @IsNotEmpty({ message: "角色不能为空" })
-  @IsEnum(UserRole, { message: "无效的用户角色" })
-  role: UserRole
+export class UpdateUserDto extends PartialType(CreateUserDto) {
+  @ApiProperty({ example: true, description: "账户是否激活", required: false })
+  @IsOptional()
+  @IsBoolean({ message: "账户状态必须是布尔值" })
+  isActive?: boolean
+
+  @ApiProperty({ example: true, description: "邮箱是否已验证", required: false })
+  @IsOptional()
+  @IsBoolean({ message: "邮箱验证状态必须是布尔值" })
+  emailVerified?: boolean
 }
