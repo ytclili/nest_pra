@@ -88,6 +88,135 @@ services:
     volumes:
       - ./logs:/app/logs    
 
+
+    # NestJS 应用
+  app2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: nestjs-app2
+    ports:   
+      - "3003:3003"
+    environment:
+      # 通过环境变量传递配置（推荐方式）
+      # 日志配置
+      LOG_LEVEL: info
+      APP_NAME: nestjs-app2
+      NODE_ENV: production
+      PORT: 3003
+      # DB_HOST: mysql
+      DB_HOST: host.docker.internal
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_NAME: test
+      DB_MAX_CONNECTIONS: 20
+      DB_CONNECTION_TIMEOUT: 60000
+      JWT_SECRET: your-super-secure-production-jwt-secret-change-this
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: your-super-secure-production-refresh-secret-change-this
+      JWT_REFRESH_EXPIRES_IN: 7d
+      THROTTLE_TTL: 60000
+      THROTTLE_LIMIT: 100
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      # - mysql
+      - redis
+    networks:
+      - nestjs-network
+    restart: unless-stopped
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/api/v1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # 应用日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        labels: "service=nestjs-app2"  
+     # 挂载日志目录到宿主机
+    volumes:
+      - ./logs:/app2/logs   
+
+
+    # NestJS 应用
+  app3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: nestjs-app3
+    ports:   
+      - "3004:3004"
+    environment:
+      # 通过环境变量传递配置（推荐方式）
+      # 日志配置
+      LOG_LEVEL: info
+      APP_NAME: nestjs-app3
+      NODE_ENV: production
+      PORT: 3004
+      # DB_HOST: mysql
+      DB_HOST: host.docker.internal
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_NAME: test
+      DB_MAX_CONNECTIONS: 20
+      DB_CONNECTION_TIMEOUT: 60000
+      JWT_SECRET: your-super-secure-production-jwt-secret-change-this
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: your-super-secure-production-refresh-secret-change-this
+      JWT_REFRESH_EXPIRES_IN: 7d
+      THROTTLE_TTL: 60000
+      THROTTLE_LIMIT: 100
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      # - mysql
+      - redis
+    networks:
+      - nestjs-network
+    restart: unless-stopped
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3004/api/v1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # 应用日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        labels: "service=nestjs-app3"  
+     # 挂载日志目录到宿主机
+    volumes:
+      - ./logs:/app3/logs           
+
+
+  nginx:
+    image: nginx:latest
+    container_name: nestjs-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+      - app2
+      - app3
+    networks:
+      - nestjs-network    
+
 volumes:
   # mysql_data:
   redis_data:
