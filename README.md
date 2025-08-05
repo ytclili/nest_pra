@@ -1,3 +1,10 @@
+
+# TODO
+
+- [ ] Nginx + 多容器架构（负载均衡）
+- [ ] 日志功能测试（中间件日志、Winston、Request ID）
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
