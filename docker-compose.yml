@@ -43,6 +43,9 @@ services:
       - "3002:3002"
     environment:
       # 通过环境变量传递配置（推荐方式）
+      # 日志配置
+      LOG_LEVEL: info
+      APP_NAME: nestjs-app
       NODE_ENV: production
       PORT: 3002
       # DB_HOST: mysql
@@ -74,6 +77,16 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    # 应用日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        labels: "service=nestjs-app"  
+     # 挂载日志目录到宿主机
+    volumes:
+      - ./logs:/app/logs    
 
 volumes:
   # mysql_data:

@@ -1,43 +1,82 @@
-import { type ExceptionFilter, Catch, type ArgumentsHost, HttpException, Logger } from "@nestjs/common"
-import type { Request, Response } from "express"
+import {  ExceptionFilter, Catch,  ArgumentsHost, HttpException, HttpStatus } from "@nestjs/common"
+import  { Request, Response } from "express"
+import  { CustomLoggerService } from "../logger/logger.service"
 
 /**
  * 全局HTTP异常过滤器
- * 统一处理应用中的所有HTTP异常，提供一致的错误响应格式
+ * 统一处理异常并记录详细日志
  */
-@Catch(HttpException)
+@Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name)
+  constructor(private readonly logger: CustomLoggerService) {
+    this.logger.setContext("ExceptionFilter")
+  }
 
-  catch(exception: HttpException, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
     const request = ctx.getRequest<Request>()
-    const status = exception.getStatus()
 
-    // 获取异常响应内容
-    const exceptionResponse = exception.getResponse()
-    const message =
-      typeof exceptionResponse === "string"
-        ? exceptionResponse
-        : (exceptionResponse as any).message || exception.message
+    let status: number
+    let message: string | object
+    let stack: string | undefined
 
-    // 构建错误响应对象
+    if (exception instanceof HttpException) {
+      status = exception.getStatus()
+      const exceptionResponse = exception.getResponse()
+      message =
+        typeof exceptionResponse === "string"
+          ? exceptionResponse
+          : (exceptionResponse as any).message || exception.message
+      stack = exception.stack
+    } else if (exception instanceof Error) {
+      status = HttpStatus.INTERNAL_SERVER_ERROR
+      message = exception.message
+      stack = exception.stack
+    } else {
+      status = HttpStatus.INTERNAL_SERVER_ERROR
+      message = "Internal server error"
+      stack = String(exception)
+    }
+
     const errorResponse = {
       statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
       message: Array.isArray(message) ? message : [message],
-      ...(process.env.NODE_ENV === "development" && {
-        stack: exception.stack, // 开发环境显示堆栈信息
-      }),
+      requestId: request.headers["x-request-id"],
+      ...(process.env.NODE_ENV === "development" && { stack }),
     }
 
     // 记录错误日志
-    this.logger.error(`HTTP ${status} Error: ${request.method} ${request.url}`, JSON.stringify(errorResponse))
+    this.logger.error(`HTTP ${status} Error: ${request.method} ${request.url}`, stack, "ExceptionFilter", {
+      requestId: request.headers["x-request-id"],
+      userId: (request as any).user?.id,
+      ip: request.ip || request.connection.remoteAddress,
+      userAgent: request.get("User-Agent"),
+      body: this.sanitizeBody(request.body),
+      query: request.query,
+      params: request.params,
+      statusCode: status,
+      errorMessage: message,
+    })
 
-    // 返回错误响应
     response.status(status).json(errorResponse)
+  }
+
+  private sanitizeBody(body: any): any {
+    if (!body || typeof body !== "object") return body
+
+    const sensitiveFields = ["password", "token", "secret", "key"]
+    const sanitized = { ...body }
+
+    for (const field of sensitiveFields) {
+      if (sanitized[field]) {
+        sanitized[field] = "***REDACTED***"
+      }
+    }
+
+    return sanitized
   }
 }

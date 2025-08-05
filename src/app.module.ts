@@ -8,9 +8,12 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
+    // 日志模块（全局）
+    LoggerModule,
     // 配置模块 - 全局可用，从环境变量读取配置
     ConfigModule.forRoot({
       isGlobal: true, // 全局模块，其他模块无需重复导入
