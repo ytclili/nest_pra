@@ -1,12 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { DelayQueueService } from "./delay-queue.service"
-import type { FanoutQueueService } from "./fanout-queue.service"
-import type { TopicQueueService } from "./topic-queue.service"
-import type { DeadLetterQueueService } from "./dead-letter-queue.service"
-import type { PriorityQueueService } from "./priority-queue.service"
-import type { WorkQueueService } from "./work-queue.service"
-import type { RabbitMQManagementService } from "./rabbitmq-management.service"
-import type { MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
+import  { DelayQueueService } from "./delay-queue.service"
+import  { FanoutQueueService } from "./fanout-queue.service"
+import  { TopicQueueService } from "./topic-queue.service"
+import  { DeadLetterQueueService } from "./dead-letter-queue.service"
+import  { PriorityQueueService } from "./priority-queue.service"
+import  { WorkQueueService } from "./work-queue.service"
+import  { RabbitMQManagementService } from "./rabbitmq-management.service"
+import  { MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
 
 /**
  * RabbitMQ 统一服务

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { v4 as uuidv4 } from "uuid"
-import type { Message } from "../interfaces/rabbitmq.interface"
+import  { Message } from "../interfaces/rabbitmq.interface"
 
 /**
  * 消息序列化服务

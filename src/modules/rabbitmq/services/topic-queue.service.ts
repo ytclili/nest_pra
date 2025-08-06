@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { RabbitMQCoreService } from "./rabbitmq-core.service"
-import type { QueueOptions, MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
+import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import  { QueueOptions, MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
 
 /**
  * 主题队列服务

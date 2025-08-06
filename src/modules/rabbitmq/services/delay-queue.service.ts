@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { RabbitMQCoreService } from "./rabbitmq-core.service"
-import type { DelayQueueOptions, MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
+import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import  { DelayQueueOptions, MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
 
 /**
  * 延迟队列服务

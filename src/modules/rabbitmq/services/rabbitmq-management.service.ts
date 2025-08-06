@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { ConfigService } from "@nestjs/config"
-import type { RabbitMQCoreService } from "./rabbitmq-core.service"
-import type { QueueStats } from "../interfaces/rabbitmq.interface"
+import  { ConfigService } from "@nestjs/config"
+import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import  { QueueStats } from "../interfaces/rabbitmq.interface"
 
 /**
  * RabbitMQ 管理服务
