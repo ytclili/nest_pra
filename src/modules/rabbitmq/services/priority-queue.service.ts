@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { RabbitMQCoreService } from "./rabbitmq-core.service"
-import type { QueueOptions, MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
+import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import  { QueueOptions, MessageHandler, PublishOptions, Message } from "../interfaces/rabbitmq.interface"
 
 /**
  * 优先级队列服务
@@ -155,7 +155,7 @@ export class PriorityQueueService {
       createdAt: string
     }>,
   ): Promise<void> {
-    await this.consumePriorityQueue("tasks", async (message) => {
+    await this.consumePriorityQueue("tasks", async (message: Message<{ type: string; data: any; createdAt: string }>) => {
       this.logger.log(`处理 ${message.data.type} 任务: ${message.id}`)
       await handler(message)
     })

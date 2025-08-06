@@ -16,6 +16,8 @@ import { RabbitMQService } from "./services/rabbitmq.service"
 
 // 控制器
 import { RabbitMQController } from "./controllers/rabbitmq.controller"
+import { RabbitMQInitService } from "./services/rabbitmq-init.service"
+import { RabbitMQEasyService } from "./services/rabbitmq-easy.service"
 
 /**
  * RabbitMQ 模块
@@ -40,6 +42,9 @@ import { RabbitMQController } from "./controllers/rabbitmq.controller"
 
     // 管理服务
     RabbitMQManagementService,
+   // 简化服务（推荐使用）
+    RabbitMQInitService,
+    RabbitMQEasyService,
 
     // 统一服务
     RabbitMQService,
@@ -54,6 +59,7 @@ import { RabbitMQController } from "./controllers/rabbitmq.controller"
     PriorityQueueService,
     WorkQueueService,
     RabbitMQManagementService,
+    RabbitMQEasyService
   ],
 })
 export class RabbitMQModule {}

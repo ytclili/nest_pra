@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { RabbitMQCoreService } from "./rabbitmq-core.service"
-import type { QueueOptions, MessageHandler, PublishOptions } from "../interfaces/rabbitmq.interface"
+import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import  { QueueOptions, MessageHandler, PublishOptions, Message } from "../interfaces/rabbitmq.interface"
 
 /**
  * 工作队列服务
@@ -57,7 +57,7 @@ export class WorkQueueService {
 
       const startTime = Date.now()
       try {
-        await handler(message)
+        await handler(message as Message<T>)  
         const duration = Date.now() - startTime
         this.logger.debug(`工作者 ${id} 完成任务: ${message.id}, 耗时: ${duration}ms`)
       } catch (error) {
@@ -73,7 +73,7 @@ export class WorkQueueService {
    * 启动多个工作者
    */
   async startMultipleWorkers<T>(queueName: string, handler: MessageHandler<T>, workerCount = 3): Promise<void> {
-    const workers = []
+    const workers: Promise<void>[] = []
 
     for (let i = 0; i < workerCount; i++) {
       const workerId = `worker-${i + 1}`

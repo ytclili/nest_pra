@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggerModule } from './common/logger/logger.module';
+import { RabbitMQModule } from "./modules/rabbitmq/rabbitmq.module"
 
 @Module({
   imports: [
@@ -70,6 +71,9 @@ import { LoggerModule } from './common/logger/logger.module';
     // 业务模块
     UsersModule, // 用户模块（必须在认证模块之前，因为认证模块依赖用户模块）
     AuthModule, // 认证模块
+
+    // RabbitMQ模块
+    RabbitMQModule,
   ],
   controllers: [AppController],
   providers: [

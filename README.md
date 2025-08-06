@@ -3,6 +3,7 @@
 
 - [ ] Nginx + 多容器架构（负载均衡）
 - [ ] 日志功能测试（中间件日志、Winston、Request ID）
+- [ ] mq模块冗余去除与校验
 
 
 <p align="center">

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { RabbitMQCoreService } from "./rabbitmq-core.service"
-import type { MessageSerializerService } from "./message-serializer.service"
-import type { DeadLetterQueueOptions, MessageHandler, Message } from "../interfaces/rabbitmq.interface"
+import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import  { MessageSerializerService } from "./message-serializer.service"
+import  { DeadLetterQueueOptions, MessageHandler, Message } from "../interfaces/rabbitmq.interface"
 
 /**
  * 死信队列服务

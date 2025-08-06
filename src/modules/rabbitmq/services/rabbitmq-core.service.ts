@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type * as amqp from "amqplib"
-import type { RabbitMQConnectionService } from "./rabbitmq-connection.service"
-import type { MessageSerializerService } from "./message-serializer.service"
-import type {
+import  * as amqp from "amqplib"
+import  { RabbitMQConnectionService } from "./rabbitmq-connection.service"
+import  { MessageSerializerService } from "./message-serializer.service"
+import  {
   QueueOptions,
   ExchangeOptions,
   ConsumerOptions,
