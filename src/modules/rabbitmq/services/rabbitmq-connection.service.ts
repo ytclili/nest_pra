@@ -34,6 +34,7 @@ export class RabbitMQConnectionService implements OnModuleInit, OnModuleDestroy 
       const url = this.buildConnectionUrl()
 
       this.logger.log("正在连接到 RabbitMQ...")
+      console.log(url,process.env.NODE_ENV )
 
       // 创建连接
       this.connection = await amqp.connect(url, {

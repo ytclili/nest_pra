@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
 import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import { Message } from "../interfaces/rabbitmq.interface"
 
 /**
  * RabbitMQ 简易服务
@@ -205,5 +206,184 @@ export class RabbitMQEasyService {
       })
     })
     return Promise.all(promises)
+  }
+
+  // ==================== 消费者方法 ====================
+
+  /**
+   * 消费邮件任务队列
+   */
+  async consumeEmailTasks(
+    handler: (emailData: {
+      to: string
+      subject: string
+      content: string
+      priority?: string
+    }) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('email-tasks', handler)
+  }
+
+  /**
+   * 消费短信任务队列
+   */
+  async consumeSMSTasks(
+    handler: (smsData: {
+      phone: string
+      message: string
+      urgent?: boolean
+    }) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('sms-tasks', handler)
+  }
+
+  /**
+   * 消费图片处理队列
+   */
+  async consumeImageProcessing(
+    handler: (imageData: {
+      imageUrl: string
+      operations: string[]
+      userId?: string
+    }) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('image-processing', handler)
+  }
+
+  /**
+   * 消费用户事件队列
+   */
+  async consumeUserEvents(
+    handler: (eventData: {
+      entity: string
+      action: string
+      data: any
+      timestamp: string
+    }) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('events.user', handler)
+  }
+
+  /**
+   * 消费订单事件队列
+   */
+  async consumeOrderEvents(
+    handler: (eventData: {
+      entity: string
+      action: string
+      data: any
+      timestamp: string
+    }) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('events.order', handler)
+  }
+
+  /**
+   * 消费错误日志队列
+   */
+  async consumeErrorLogs(
+    handler: (logData: {
+      level: string
+      service: string
+      message: string
+      error?: any
+      timestamp: string
+    }) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('logs.error', handler)
+  }
+
+  /**
+   * 消费Web通知队列
+   */
+  async consumeWebNotifications(
+    handler: (notification: any) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('notifications.web', handler)
+  }
+
+  /**
+   * 消费紧急任务队列
+   */
+  async consumeUrgentTasks(
+    handler: (taskData: any) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('urgent-tasks', handler)
+  }
+
+  /**
+   * 通用队列消费方法（手动ACK）
+   */
+  async consumeQueue<T>(
+    queueName: string,
+    handler: (data: T) => Promise<void>,
+    options?: {
+      prefetch?: number
+      workerId?: string
+    }
+  ): Promise<void> {
+    const workerId = options?.workerId || `worker-${Math.random().toString(36).substr(2, 9)}`
+    
+    this.logger.log(`🔄 工作者 ${workerId} 开始消费队列: ${queueName}`)
+
+    // 设置预取数量
+    if (options?.prefetch) {
+      const channel = this.coreService['connectionService'].getChannel()
+      await channel.prefetch(options.prefetch)
+    }
+
+    await this.coreService.consume(
+      queueName,
+      async (message:Message) => {
+        const startTime = Date.now()
+        
+        this.logger.log(`📨 工作者 ${workerId} 收到消息: ${message.id}`)
+        this.logger.debug(`📄 消息内容:`, message.data)
+
+        try {
+          // 调用业务处理函数
+          await handler(message.data)
+          
+          const duration = Date.now() - startTime
+          this.logger.log(`✅ 工作者 ${workerId} 处理完成: ${message.id}, 耗时: ${duration}ms`)
+          
+        } catch (error) {
+          const duration = Date.now() - startTime
+          this.logger.error(`❌ 工作者 ${workerId} 处理失败: ${message.id}, 耗时: ${duration}ms, 错误: ${error.message}`)
+          throw error // 重新抛出错误，让 coreService 处理 nack
+        }
+      },
+      {
+        noAck: false, // 手动确认
+        exclusive: false
+      }
+    )
+  }
+
+  /**
+   * 启动多个工作者消费同一个队列
+   */
+  async startMultipleWorkers<T>(
+    queueName: string,
+    handler: (data: T) => Promise<void>,
+    workerCount: number = 3,
+    options?: {
+      prefetch?: number
+    }
+  ): Promise<void> {
+    this.logger.log(`🚀 启动 ${workerCount} 个工作者消费队列: ${queueName}`)
+
+    const workers:any[] = []
+    for (let i = 0; i < workerCount; i++) {
+      const workerId = `${queueName}-worker-${i + 1}`
+      workers.push(
+        this.consumeQueue(queueName, handler, {
+          ...options,
+          workerId
+        })
+      )
+    }
+
+    await Promise.all(workers)
   }
 }

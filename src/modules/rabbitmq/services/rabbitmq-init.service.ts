@@ -1,5 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common"
 import  { RabbitMQCoreService } from "./rabbitmq-core.service"
+import { BusinessConsumer } from "../consumers/business.consumer"
 import { QUEUE_CONFIGS } from "../config/queue.config"
 
 /**
@@ -11,12 +12,14 @@ export class RabbitMQInitService implements OnModuleInit {
   private readonly logger = new Logger(RabbitMQInitService.name)
   private initialized = false
 
-  constructor(private readonly coreService: RabbitMQCoreService) {}
+  constructor(private readonly coreService: RabbitMQCoreService,private readonly business: BusinessConsumer) {}
 
   async onModuleInit() {
     // 延迟3秒确保连接已建立
-    setTimeout(() => {
-      this.initializeQueues()
+    setTimeout(async () => {
+      await this.initializeQueues()
+       this.logger.verbose("🚀 队列初始化完成开始消费所有队列...")
+      await this.business.startAllConsumers()
     }, 3000)
   }
 

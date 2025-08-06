@@ -13,11 +13,14 @@ import { PriorityQueueService } from "./services/priority-queue.service"
 import { WorkQueueService } from "./services/work-queue.service"
 import { RabbitMQManagementService } from "./services/rabbitmq-management.service"
 import { RabbitMQService } from "./services/rabbitmq.service"
+import { RabbitMQInitService } from "./services/rabbitmq-init.service"
+import { RabbitMQEasyService } from "./services/rabbitmq-easy.service"
+import { BusinessConsumer } from "./consumers/business.consumer" 
 
 // 控制器
 import { RabbitMQController } from "./controllers/rabbitmq.controller"
-import { RabbitMQInitService } from "./services/rabbitmq-init.service"
-import { RabbitMQEasyService } from "./services/rabbitmq-easy.service"
+import { RabbitMQConsumerController } from "./controllers/rabbitmq-consumer.controller"
+
 
 /**
  * RabbitMQ 模块
@@ -46,10 +49,12 @@ import { RabbitMQEasyService } from "./services/rabbitmq-easy.service"
     RabbitMQInitService,
     RabbitMQEasyService,
 
+    // 消费者
+    BusinessConsumer, // 添加这一行
     // 统一服务
     RabbitMQService,
   ],
-  controllers: [RabbitMQController],
+  controllers: [RabbitMQController,RabbitMQConsumerController],
   exports: [
     RabbitMQService,
     DelayQueueService,
