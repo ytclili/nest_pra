@@ -125,7 +125,16 @@ export interface QueueConfig {
           'x-max-priority': 10
         }
       }
-    }
+    },
+
+    // ==================== 测试 ====================
+
+    {
+      queue: 'order-tasks',
+      exchange: 'order-exchange',
+      exchangeType: 'direct',
+      routingKey: 'order-test'
+    },
   ]
   
   /**

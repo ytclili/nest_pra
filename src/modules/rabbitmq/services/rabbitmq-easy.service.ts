@@ -62,12 +62,20 @@ export class RabbitMQEasyService {
     })
   }
 
+   async publishOrderTestEvent( userData: any): Promise<boolean> {
+    return this.publishToExchange('order-exchange', `order-test`, {
+      entity: 'order',
+      data: userData,
+      timestamp: new Date().toISOString()
+    })
+  }
+
   /**
    * 发布订单事件
    */
   async publishOrderEvent(action: string, orderData: any): Promise<boolean> {
     return this.publishToExchange('events-exchange', `order.${action}`, {
-      entity: 'order',
+      entity: 'order-tasks',
       action,
       data: orderData,
       timestamp: new Date().toISOString()
@@ -386,4 +394,14 @@ export class RabbitMQEasyService {
 
     await Promise.all(workers)
   }
+
+  /**
+   * 测试消费
+   */ 
+async consumeOrderTestEvent(
+    handler: (data: any) => Promise<void>
+  ): Promise<void> {
+    await this.consumeQueue('order-tasks', handler)
+  }
 }
+

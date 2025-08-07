@@ -39,6 +39,7 @@ export class BusinessConsumer implements OnModuleInit {
       this.startErrorLogConsumer(),
       this.startNotificationConsumer(),
       this.startUrgentTaskConsumer(),
+      this.startOrderTestConsumer(),
     ])
 
     this.logger.log('✅ 所有业务消费者启动完成')
@@ -189,6 +190,23 @@ export class BusinessConsumer implements OnModuleInit {
     )
   }
 
+  /**
+   * test order
+   */ 
+  async startOrderTestConsumer(): Promise<void> {
+    this.logger.log('🛒 启动订单测试消费者...')
+    
+    await this.rabbitMQEasyService.consumeOrderTestEvent(async (eventData) => {
+      this.logger.log(`🛒 处理订单测试事件: ${eventData.action}`)
+      
+      // 处理订单测试事件
+      await this.handleOrderTestEvent(eventData)
+      
+      this.logger.log(`✅ 订单测试事件处理完成: ${eventData.action}`)
+    })
+  }
+
+
   // ==================== 业务处理方法 ====================
 
   /**
@@ -329,6 +347,17 @@ export class BusinessConsumer implements OnModuleInit {
     // 这里处理紧急任务逻辑
     // 如系统维护、紧急修复等
   }
+
+  /**
+   * 处理订单测试事件
+   */
+  private async handleOrderTestEvent(eventData: any): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
+    // 订单测试事件逻辑
+    this.logger.log(`🛒 订单测试事件处理:`, JSON.stringify(eventData, null, 2))
+  }
+
 
   /**
    * 停止所有消费者

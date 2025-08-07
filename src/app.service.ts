@@ -6,7 +6,9 @@ import { RabbitMQEasyService } from './modules/rabbitmq/services/rabbitmq-easy.s
 export class AppService {
   constructor(private readonly configService: ConfigService,private readonly rabbitMQEasyService: RabbitMQEasyService) {}
   getHello(): string {
-    this.rabbitMQEasyService.publishOrderEvent("create",{name: "test111"})
+    // this.rabbitMQEasyService.publishOrderEvent("create",{name: "test111"})
+    this.rabbitMQEasyService.publishOrderTestEvent("hi this is test message")
+
     return `Hello ${this.configService.get('APP_NAME')}!`;
   }
 }

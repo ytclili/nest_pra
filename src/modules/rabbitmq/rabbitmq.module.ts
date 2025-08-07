@@ -15,12 +15,16 @@ import { RabbitMQManagementService } from "./services/rabbitmq-management.servic
 import { RabbitMQService } from "./services/rabbitmq.service"
 import { RabbitMQInitService } from "./services/rabbitmq-init.service"
 import { RabbitMQEasyService } from "./services/rabbitmq-easy.service"
-import { BusinessConsumer } from "./consumers/business.consumer" 
+import { ManualAckDemoService } from "./services/manual-ack-demo.service"
 
 // 控制器
 import { RabbitMQController } from "./controllers/rabbitmq.controller"
 import { RabbitMQConsumerController } from "./controllers/rabbitmq-consumer.controller"
+import { ManualAckDemoController } from "./controllers/manual-ack-demo.controller"
 
+
+// Consumers
+import { BusinessConsumer } from "./consumers/business.consumer" 
 
 /**
  * RabbitMQ 模块
@@ -53,8 +57,9 @@ import { RabbitMQConsumerController } from "./controllers/rabbitmq-consumer.cont
     BusinessConsumer, // 添加这一行
     // 统一服务
     RabbitMQService,
+    ManualAckDemoService
   ],
-  controllers: [RabbitMQController,RabbitMQConsumerController],
+  controllers: [RabbitMQController,RabbitMQConsumerController,ManualAckDemoController],
   exports: [
     RabbitMQService,
     DelayQueueService,
@@ -64,7 +69,8 @@ import { RabbitMQConsumerController } from "./controllers/rabbitmq-consumer.cont
     PriorityQueueService,
     WorkQueueService,
     RabbitMQManagementService,
-    RabbitMQEasyService
+    RabbitMQEasyService,
+    ManualAckDemoService
   ],
 })
 export class RabbitMQModule {}

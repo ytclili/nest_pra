@@ -8,6 +8,7 @@ import  {
   ConsumerOptions,
   PublishOptions,
   MessageHandler,
+  Message,
 } from "../interfaces/rabbitmq.interface"
 
 /**
@@ -183,6 +184,77 @@ export class RabbitMQCoreService {
 
     return result
   }
+
+
+   /**
+   * 手动ACK消费队列消息
+   */
+   async consumeWithManualAck<T>(
+    queue: string,
+    handler: (message: Message<T>, ackCallback: {
+      ack: () => void
+      nack: (requeue?: boolean) => void
+      reject: (requeue?: boolean) => void
+    }) => Promise<void>,
+    options: {
+      prefetch?: number
+      exclusive?: boolean
+    } = {}
+  ): Promise<amqp.Replies.Consume> {
+    const channel = this.connectionService.getChannel()
+
+    // 设置预取数量
+    if (options.prefetch) {
+      await channel.prefetch(options.prefetch)
+    }
+
+    const result = await channel.consume(
+      queue,
+      async (msg) => {
+        if (!msg) return
+
+        try {
+          // 反序列化消息
+          const message:Message<T> = this.serializerService.deserialize<T>(msg.content)
+
+          this.logger.debug(`收到消息: ${message.id}`)
+
+          // 创建ACK回调函数
+          const ackCallback = {
+            ack: () => {
+              channel.ack(msg)
+              this.logger.debug(`消息ACK: ${message.id}`)
+            },
+            nack: (requeue = true) => {
+              channel.nack(msg, false, requeue)
+              this.logger.debug(`消息NACK: ${message.id}, requeue: ${requeue}`)
+            },
+            reject: (requeue = true) => {
+              channel.reject(msg, requeue)
+              this.logger.debug(`消息REJECT: ${message.id}, requeue: ${requeue}`)
+            }
+          }
+
+          // 调用处理器
+          await handler(message, ackCallback)
+
+        } catch (error) {
+          this.logger.error(`消息处理异常: ${error.message}`)
+          // 如果处理器抛出异常，默认NACK并重新入队
+          channel.nack(msg, false, true)
+        }
+      },
+      {
+        noAck: false, // 手动ACK
+        exclusive: options.exclusive ?? false,
+      },
+    )
+
+    this.logger.log(`开始手动ACK消费队列 ${queue}`)
+
+    return result
+  }
+
 
   /**
    * 获取队列信息
