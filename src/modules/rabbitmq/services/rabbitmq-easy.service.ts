@@ -322,7 +322,7 @@ export class RabbitMQEasyService {
   /**
    * 通用队列消费方法（手动ACK）
    */
-  async consumeQueue<T>(
+  async consumeQueue<T>(      
     queueName: string,
     handler: (data: T) => Promise<void>,
     options?: {
