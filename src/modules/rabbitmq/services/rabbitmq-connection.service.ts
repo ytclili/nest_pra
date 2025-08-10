@@ -118,8 +118,8 @@ export class RabbitMQConnectionService implements OnModuleInit, OnModuleDestroy 
   private buildConnectionUrl(): string {
     const host = this.configService.get("RABBITMQ_HOST", "localhost")
     const port = this.configService.get("RABBITMQ_PORT", 5672)
-    const username = this.configService.get("RABBITMQ_USERNAME", "guest")
-    const password = this.configService.get("RABBITMQ_PASSWORD", "guest")
+    const username = this.configService.get("RABBITMQ_USERNAME", "admin")
+    const password = this.configService.get("RABBITMQ_PASSWORD", "admin123")
     const vhost = this.configService.get("RABBITMQ_VHOST", "/")
 
     return `amqp://${username}:${password}@${host}:${port}${vhost}`

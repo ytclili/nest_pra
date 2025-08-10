@@ -175,7 +175,7 @@ export class RabbitMQExamplesService {
 
     await this.easy.startMultipleWorkers(
       "email-tasks",
-      async (email) => {
+      async (email:any) => {
         // 模拟不同耗时的工作，观察公平分发
                 await new Promise((r) => setTimeout(r, 500 + Math.random() * 1500))
                 this.logger.log(`完成邮件任务: ${email.to}`)

@@ -10,6 +10,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggerModule } from './common/logger/logger.module';
 import { RabbitMQModule } from "./modules/rabbitmq/rabbitmq.module"
+import { RedisModule } from "./modules/redis/redis.module"
 
 @Module({
   imports: [
@@ -74,6 +75,8 @@ import { RabbitMQModule } from "./modules/rabbitmq/rabbitmq.module"
 
     // RabbitMQ模块
     RabbitMQModule,
+    // redis 
+    RedisModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

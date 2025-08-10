@@ -9,6 +9,7 @@ export class AppService {
     // this.rabbitMQEasyService.publishOrderEvent("create",{name: "test111"})
     this.rabbitMQEasyService.publishOrderTestEvent("hi this is test message")
 
+
     return `Hello ${this.configService.get('APP_NAME')}!`;
   }
 }

@@ -22,7 +22,7 @@ services:
 
   # Redis (可选，用于缓存)
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: nestjs-auth-redis
     ports:
       - "6379:6379"
@@ -64,6 +64,9 @@ services:
       THROTTLE_LIMIT: 100
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: admin
+      RABBITMQ_PASSWORD: admin123
     depends_on:
       # - mysql
       - redis
@@ -72,7 +75,7 @@ services:
     restart: unless-stopped
     # 健康检查
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/api/v1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3002/api/docs"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -121,6 +124,9 @@ services:
       THROTTLE_LIMIT: 100
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: admin
+      RABBITMQ_PASSWORD: admin123
     depends_on:
       # - mysql
       - redis
@@ -129,7 +135,7 @@ services:
     restart: unless-stopped
     # 健康检查
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/api/v1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3003/api/docs"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -178,6 +184,9 @@ services:
       THROTTLE_LIMIT: 100
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: admin
+      RABBITMQ_PASSWORD: admin123
     depends_on:
       # - mysql
       - redis
@@ -186,7 +195,7 @@ services:
     restart: unless-stopped
     # 健康检查
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3004/api/v1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3004/api/docs"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -217,9 +226,39 @@ services:
     networks:
       - nestjs-network    
 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: nestjs-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "5672:5672"     # AMQP 端口
+      - "15672:15672"   # Management UI 端口
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      # - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
+    networks:
+      - nestjs-network
+    restart: unless-stopped
+    # 启用延迟消息插件
+    # command: >
+    #   bash -c "
+    #     rabbitmq-plugins enable rabbitmq_delayed_message_exchange &&
+    #     rabbitmq-server
+    #   "
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "service=rabbitmq"    
+
 volumes:
   # mysql_data:
   redis_data:
+  rabbitmq_data:
 
 networks:
   nestjs-network:
