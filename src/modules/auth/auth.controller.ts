@@ -143,4 +143,17 @@ export class AuthController {
     await this.authService.resetPassword(resetPasswordDto);
     return { message: '密码重置成功' };
   }
+
+
+
+  @Post('test')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '使用重置令牌重置密码' })
+  @ApiResponse({ status: 200, description: '密码重置成功' })
+  async test() {
+    return { message: '密码重置成功' };
+  }
+
 }
+
