@@ -11,6 +11,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggerModule } from './common/logger/logger.module';
 import { RabbitMQModule } from "./modules/rabbitmq/rabbitmq.module"
 import { RedisModule } from "./modules/redis/redis.module"
+import { MetricsModule } from './modules/metrics/metrics.module';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { RedisModule } from "./modules/redis/redis.module"
     RabbitMQModule,
     // redis 
     RedisModule.forRoot(),
+    MetricsModule,
   ],
   controllers: [AppController],
   providers: [
