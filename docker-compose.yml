@@ -226,6 +226,18 @@ services:
     networks:
       - nestjs-network    
 
+
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter
+    container_name: nginx-exporter
+    ports: ["9113:9113"]
+    command: 
+      - '-nginx.scrape-uri=http://nginx:80/stub_status'
+    networks: [nestjs-network]
+    depends_on: [nginx]
+    restart: unless-stopped   
+
   rabbitmq:
     image: rabbitmq:management
     container_name: nestjs-rabbitmq
@@ -236,6 +248,7 @@ services:
     ports:
       - "5672:5672"     # AMQP 端口
       - "15672:15672"   # Management UI 端口
+      - "15692:15692"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
       # - ./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins
@@ -253,7 +266,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-        labels: "service=rabbitmq"    
+        labels: "service=rabbitmq"      
 
   # Prometheus 监控服务
   prometheus:
