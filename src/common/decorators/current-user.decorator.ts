@@ -1,4 +1,4 @@
-import { createParamDecorator, type ExecutionContext } from "@nestjs/common"
+import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
 
 /**
  * 当前用户装饰器
@@ -17,10 +17,12 @@ import { createParamDecorator, type ExecutionContext } from "@nestjs/common"
  *   return { userId }; // 只返回用户ID
  * }
  */
-export const CurrentUser = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
-  const request = ctx.switchToHttp().getRequest()
-  const user = request.user // 由认证守卫注入的用户信息
+export const CurrentUser = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    const user = request.user; // 由认证守卫注入的用户信息
 
-  // 如果指定了特定属性，则返回该属性值
-  return data ? user?.[data as string] : user
-})
+    // 如果指定了特定属性，则返回该属性值
+    return data ? user?.[data as string] : user;
+  },
+);

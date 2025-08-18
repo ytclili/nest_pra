@@ -1,11 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common"
-import { Repository } from "typeorm"
-import { InjectRepository } from "@nestjs/typeorm"
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
-import { User } from "./entities/user.entity"
-import { CreateUserDto } from "./dto/create-user.dto"
-import { UpdateUserDto } from "./dto/update-user.dto"
-import { UserRole } from "./enums/user-role.enum"
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserRole } from './enums/user-role.enum';
 
 /**
  * 用户服务 - 处理用户相关的业务逻辑
@@ -15,7 +19,7 @@ import { UserRole } from "./enums/user-role.enum"
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
   ) {}
 
   /**
@@ -25,19 +29,19 @@ export class UsersService {
    */
   async create(createUserDto: CreateUserDto): Promise<User> {
     // 检查邮箱是否已存在
-    const existingUser = await this.findByEmail(createUserDto.email)
+    const existingUser = await this.findByEmail(createUserDto.email);
     if (existingUser) {
-      throw new BadRequestException("该邮箱已被注册")
+      throw new BadRequestException('该邮箱已被注册');
     }
 
     // 创建用户实例
-    const user = this.userRepository.create(createUserDto)
+    const user = this.userRepository.create(createUserDto);
 
     // 保存到数据库
-    const savedUser = await this.userRepository.save(user)
+    const savedUser = await this.userRepository.save(user);
 
     // 返回用户信息（class-transformer 会自动排除 @Exclude 字段）
-    return savedUser
+    return savedUser;
   }
 
   /**
@@ -46,14 +50,17 @@ export class UsersService {
    * @param limit 每页数量
    * @returns 用户列表和总数
    */
-  async findAll(page = 1, limit = 10): Promise<{ users: User[]; total: number }> {
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ users: User[]; total: number }> {
     const [users, total] = await this.userRepository.findAndCount({
       skip: (page - 1) * limit, // 跳过的记录数
       take: limit, // 获取的记录数
-      order: { createdAt: "DESC" }, // 按创建时间倒序
-    })
+      order: { createdAt: 'DESC' }, // 按创建时间倒序
+    });
 
-    return { users, total }
+    return { users, total };
   }
 
   /**
@@ -62,7 +69,7 @@ export class UsersService {
    * @returns 用户信息或null
    */
   async findById(id: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { id } })
+    return this.userRepository.findOne({ where: { id } });
   }
 
   /**
@@ -71,7 +78,7 @@ export class UsersService {
    * @returns 用户信息或null
    */
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { email } })
+    return this.userRepository.findOne({ where: { email } });
   }
 
   /**
@@ -82,7 +89,7 @@ export class UsersService {
   async findByResetToken(resetToken: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { resetToken },
-    })
+    });
   }
 
   /**
@@ -93,7 +100,7 @@ export class UsersService {
   async findByEmailVerificationToken(token: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { emailVerificationToken: token },
-    })
+    });
   }
 
   /**
@@ -104,24 +111,24 @@ export class UsersService {
    */
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     // 检查用户是否存在
-    const user = await this.findById(id)
+    const user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException("用户不存在")
+      throw new NotFoundException('用户不存在');
     }
 
     // 如果要更新邮箱，检查新邮箱是否已被使用
     if (updateUserDto.email && updateUserDto.email !== user.email) {
-      const existingUser = await this.findByEmail(updateUserDto.email)
+      const existingUser = await this.findByEmail(updateUserDto.email);
       if (existingUser) {
-        throw new BadRequestException("该邮箱已被其他用户使用")
+        throw new BadRequestException('该邮箱已被其他用户使用');
       }
     }
 
     // 合并更新数据
-    Object.assign(user, updateUserDto)
+    Object.assign(user, updateUserDto);
 
     // 保存更新
-    return this.userRepository.save(user)
+    return this.userRepository.save(user);
   }
 
   /**
@@ -135,7 +142,7 @@ export class UsersService {
       // 密码更新后重置登录失败次数
       failedLoginAttempts: 0,
       lockedUntil: undefined,
-    })
+    });
   }
 
   /**
@@ -144,11 +151,15 @@ export class UsersService {
    * @param resetToken 重置令牌
    * @param resetTokenExpiry 令牌过期时间
    */
-  async updateResetToken(id: string, resetToken: string, resetTokenExpiry: Date): Promise<void> {
+  async updateResetToken(
+    id: string,
+    resetToken: string,
+    resetTokenExpiry: Date,
+  ): Promise<void> {
     await this.userRepository.update(id, {
       resetToken,
       resetTokenExpiry,
-    })
+    });
   }
 
   /**
@@ -159,7 +170,7 @@ export class UsersService {
     await this.userRepository.update(id, {
       resetToken: undefined,
       resetTokenExpiry: undefined,
-    })
+    });
   }
 
   /**
@@ -168,11 +179,15 @@ export class UsersService {
    * @param token 验证令牌
    * @param expiry 令牌过期时间
    */
-  async setEmailVerificationToken(id: string, token: string, expiry: Date): Promise<void> {
+  async setEmailVerificationToken(
+    id: string,
+    token: string,
+    expiry: Date,
+  ): Promise<void> {
     await this.userRepository.update(id, {
       emailVerificationToken: token,
       emailVerificationExpiry: expiry,
-    })
+    });
   }
 
   /**
@@ -184,7 +199,7 @@ export class UsersService {
       emailVerified: true,
       emailVerificationToken: undefined,
       emailVerificationExpiry: undefined,
-    })
+    });
   }
 
   /**
@@ -193,13 +208,13 @@ export class UsersService {
    * @param role 新角色
    */
   async updateRole(id: string, role: UserRole): Promise<User> {
-    const user = await this.findById(id)
+    const user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException("用户不存在")
+      throw new NotFoundException('用户不存在');
     }
 
-    user.role = role
-    return this.userRepository.save(user)
+    user.role = role;
+    return this.userRepository.save(user);
   }
 
   /**
@@ -208,13 +223,13 @@ export class UsersService {
    * @param permissions 权限列表
    */
   async updatePermissions(id: string, permissions: string[]): Promise<User> {
-    const user = await this.findById(id)
+    const user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException("用户不存在")
+      throw new NotFoundException('用户不存在');
     }
 
-    user.permissions = permissions
-    return this.userRepository.save(user)
+    user.permissions = permissions;
+    return this.userRepository.save(user);
   }
 
   /**
@@ -223,13 +238,13 @@ export class UsersService {
    * @param isActive 是否激活
    */
   async toggleUserStatus(id: string, isActive: boolean): Promise<User> {
-    const user = await this.findById(id)
+    const user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException("用户不存在")
+      throw new NotFoundException('用户不存在');
     }
 
-    user.isActive = isActive
-    return this.userRepository.save(user)
+    user.isActive = isActive;
+    return this.userRepository.save(user);
   }
 
   /**
@@ -238,18 +253,22 @@ export class UsersService {
    * @param maxAttempts 最大失败次数，默认5次
    * @param lockDuration 锁定时长（分钟），默认30分钟
    */
-  async recordFailedLogin(id: string, maxAttempts = 5, lockDuration = 30): Promise<void> {
-    const user = await this.findById(id)
-    if (!user) return
+  async recordFailedLogin(
+    id: string,
+    maxAttempts = 5,
+    lockDuration = 30,
+  ): Promise<void> {
+    const user = await this.findById(id);
+    if (!user) return;
 
-    user.failedLoginAttempts += 1
+    user.failedLoginAttempts += 1;
 
     // 如果失败次数达到上限，锁定账户
     if (user.failedLoginAttempts >= maxAttempts) {
-      user.lockedUntil = new Date(Date.now() + lockDuration * 60 * 1000)
+      user.lockedUntil = new Date(Date.now() + lockDuration * 60 * 1000);
     }
 
-    await this.userRepository.save(user)
+    await this.userRepository.save(user);
   }
 
   /**
@@ -263,7 +282,7 @@ export class UsersService {
       lastLoginIp: ip,
       failedLoginAttempts: 0, // 重置失败次数
       lockedUntil: undefined, // 解除锁定
-    })
+    });
   }
 
   /**
@@ -271,13 +290,13 @@ export class UsersService {
    * @param id 用户ID
    */
   async remove(id: string): Promise<void> {
-    const user = await this.findById(id)
+    const user = await this.findById(id);
     if (!user) {
-      throw new NotFoundException("用户不存在")
+      throw new NotFoundException('用户不存在');
     }
 
     // 软删除：停用账户而不是真正删除
-    await this.toggleUserStatus(id, false)
+    await this.toggleUserStatus(id, false);
   }
 
   /**
@@ -286,9 +305,9 @@ export class UsersService {
    * @param id 用户ID
    */
   async hardDelete(id: string): Promise<void> {
-    const result = await this.userRepository.delete(id)
+    const result = await this.userRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException("用户不存在")
+      throw new NotFoundException('用户不存在');
     }
   }
 
@@ -299,23 +318,30 @@ export class UsersService {
    * @param limit 每页数量
    * @returns 搜索结果
    */
-  async search(query: string, page = 1, limit = 10): Promise<{ users: User[]; total: number }> {
-    const queryBuilder = this.userRepository.createQueryBuilder("user")
+  async search(
+    query: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ users: User[]; total: number }> {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
 
     // 搜索邮箱、名字、姓氏
-    queryBuilder.where("user.email ILIKE :query OR user.firstName ILIKE :query OR user.lastName ILIKE :query", {
-      query: `%${query}%`,
-    })
+    queryBuilder.where(
+      'user.email ILIKE :query OR user.firstName ILIKE :query OR user.lastName ILIKE :query',
+      {
+        query: `%${query}%`,
+      },
+    );
 
     // 分页
     queryBuilder
       .skip((page - 1) * limit)
       .take(limit)
-      .orderBy("user.createdAt", "DESC")
+      .orderBy('user.createdAt', 'DESC');
 
-    const [users, total] = await queryBuilder.getManyAndCount()
+    const [users, total] = await queryBuilder.getManyAndCount();
 
-    return { users, total }
+    return { users, total };
   }
 
   /**
@@ -323,23 +349,27 @@ export class UsersService {
    * @returns 用户统计数据
    */
   async getStats(): Promise<{
-    total: number
-    active: number
-    inactive: number
-    verified: number
-    unverified: number
-    byRole: Record<UserRole, number>
+    total: number;
+    active: number;
+    inactive: number;
+    verified: number;
+    unverified: number;
+    byRole: Record<UserRole, number>;
   }> {
-    const total = await this.userRepository.count()
-    const active = await this.userRepository.count({ where: { isActive: true } })
-    const inactive = total - active
-    const verified = await this.userRepository.count({ where: { emailVerified: true } })
-    const unverified = total - verified
+    const total = await this.userRepository.count();
+    const active = await this.userRepository.count({
+      where: { isActive: true },
+    });
+    const inactive = total - active;
+    const verified = await this.userRepository.count({
+      where: { emailVerified: true },
+    });
+    const unverified = total - verified;
 
     // 按角色统计
-    const byRole: Record<UserRole, number> = {} as Record<UserRole, number>
+    const byRole: Record<UserRole, number> = {} as Record<UserRole, number>;
     for (const role of Object.values(UserRole)) {
-      byRole[role] = await this.userRepository.count({ where: { role } })
+      byRole[role] = await this.userRepository.count({ where: { role } });
     }
 
     return {
@@ -349,6 +379,6 @@ export class UsersService {
       verified,
       unverified,
       byRole,
-    }
+    };
   }
 }

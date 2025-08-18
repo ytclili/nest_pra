@@ -9,8 +9,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggerModule } from './common/logger/logger.module';
-import { RabbitMQModule } from "./modules/rabbitmq/rabbitmq.module"
-import { RedisModule } from "./modules/redis/redis.module"
+import { RabbitMQModule } from './modules/rabbitmq/rabbitmq.module';
+import { RedisModule } from './modules/redis/redis.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 
 @Module({
@@ -76,7 +76,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
 
     // RabbitMQ模块
     RabbitMQModule,
-    // redis 
+    // redis
     RedisModule.forRoot(),
     MetricsModule,
   ],

@@ -1,8 +1,8 @@
-import { SetMetadata } from "@nestjs/common"
-import type { UserRole } from "../../users/enums/user-role.enum"
+import { SetMetadata } from '@nestjs/common';
+import type { UserRole } from '../../users/enums/user-role.enum';
 
 // 角色元数据键
-export const ROLES_KEY = "roles"
+export const ROLES_KEY = 'roles';
 
 /**
  * 角色装饰器
@@ -15,4 +15,4 @@ export const ROLES_KEY = "roles"
  *   return { message: '只有管理员可以访问' }
  * }
  */
-export const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles)
+export const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);

@@ -1,24 +1,38 @@
-import { Controller, Post, Body, UseGuards, Request, HttpCode, HttpStatus, Get } from "@nestjs/common"
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from "@nestjs/swagger"
-import { Throttle } from "@nestjs/throttler"
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  HttpCode,
+  HttpStatus,
+  Get,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
-import { AuthService } from "./auth.service"
-import { JwtAuthGuard } from "./guards/jwt-auth.guard"
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 // import { JwtRefreshGuard } from "./guards/jwt-refresh.guard"
-import { RegisterDto } from "./dto/register.dto"
-import { ChangePasswordDto } from "./dto/change-password.dto"
-import { ForgotPasswordDto } from "./dto/forgot-password.dto"
-import { ResetPasswordDto } from "./dto/reset-password.dto"
-import { CurrentUser } from "../../common/decorators/current-user.decorator"
-import { User } from "../users/entities/user.entity"
-import { AuthResponseDto } from "./dto/auth-response.dto"
+import { RegisterDto } from './dto/register.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
+import { AuthResponseDto } from './dto/auth-response.dto';
 
 /**
  * 认证控制器 - 处理所有认证相关的 HTTP 请求
  * 包括注册、登录、令牌刷新、密码管理等功能
  */
-@ApiTags("Authentication") // Swagger 文档标签
-@Controller("auth") // 路由前缀为 /auth
+@ApiTags('Authentication') // Swagger 文档标签
+@Controller('auth') // 路由前缀为 /auth
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -26,12 +40,16 @@ export class AuthController {
    * 用户注册接口
    * POST /auth/register
    */
-  @Post("register")
+  @Post('register')
   @Throttle({ default: { limit: 3, ttl: 60000 } }) // 限流：每分钟最多3次请求，防止恶意注册
-  @ApiOperation({ summary: "注册新用户" })
-  @ApiResponse({ status: 201, description: "用户注册成功", type: AuthResponseDto })
+  @ApiOperation({ summary: '注册新用户' })
+  @ApiResponse({
+    status: 201,
+    description: '用户注册成功',
+    type: AuthResponseDto,
+  })
   async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(registerDto)
+    return this.authService.register(registerDto);
   }
 
   /**
@@ -58,7 +76,11 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: '刷新访问令牌' })
-  @ApiResponse({ status: 200, description: '令牌刷新成功', type: AuthResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: '令牌刷新成功',
+    type: AuthResponseDto,
+  })
   async refresh(@Request() req): Promise<AuthResponseDto> {
     // 使用用户ID和刷新令牌生成新的令牌对
     return this.authService.refreshTokens(req.user.id, req.user.refreshToken);
@@ -101,17 +123,17 @@ export class AuthController {
    * 需要提供当前密码和新密码
    */
   @UseGuards(JwtAuthGuard) // 需要登录
-  @Post("change-password")
+  @Post('change-password')
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "修改用户密码" })
-  @ApiResponse({ status: 200, description: "密码修改成功" })
+  @ApiOperation({ summary: '修改用户密码' })
+  @ApiResponse({ status: 200, description: '密码修改成功' })
   async changePassword(
     @CurrentUser() user: User,
     @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
-    await this.authService.changePassword(user.id, changePasswordDto)
-    return { message: "密码修改成功" }
+    await this.authService.changePassword(user.id, changePasswordDto);
+    return { message: '密码修改成功' };
   }
 
   /**
@@ -124,7 +146,9 @@ export class AuthController {
   @Throttle({ default: { limit: 2, ttl: 300000 } }) // 限流：5分钟内最多2次请求，防止邮件轰炸
   @ApiOperation({ summary: '请求密码重置' })
   @ApiResponse({ status: 200, description: '密码重置邮件已发送' })
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string }> {
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
     await this.authService.forgotPassword(forgotPasswordDto.email);
     // 为了安全，不管邮箱是否存在都返回相同消息
     return { message: '如果邮箱存在，密码重置链接已发送' };
@@ -139,12 +163,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: '使用重置令牌重置密码' })
   @ApiResponse({ status: 200, description: '密码重置成功' })
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<{ message: string }> {
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
     await this.authService.resetPassword(resetPasswordDto);
     return { message: '密码重置成功' };
   }
-
-
 
   @Post('test')
   @UseGuards(JwtAuthGuard)
@@ -154,6 +178,4 @@ export class AuthController {
   async test() {
     return { message: '密码重置成功' };
   }
-
 }
-

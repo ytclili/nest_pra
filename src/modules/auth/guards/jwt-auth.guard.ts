@@ -1,7 +1,7 @@
-import { Injectable, type ExecutionContext } from "@nestjs/common"
-import { AuthGuard } from "@nestjs/passport"
-import type { Reflector } from "@nestjs/core"
-import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
+import { Injectable, type ExecutionContext } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import type { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 
 /**
  * JWT 认证守卫 - 保护需要认证的路由
@@ -9,9 +9,9 @@ import { IS_PUBLIC_KEY } from "../decorators/public.decorator"
  * 支持通过 @Public() 装饰器跳过认证
  */
 @Injectable()
-export class JwtAuthGuard extends AuthGuard("jwt") {
+export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
-    super()
+    super();
   }
 
   /**
@@ -24,14 +24,14 @@ export class JwtAuthGuard extends AuthGuard("jwt") {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(), // 方法级别的装饰器
       context.getClass(), // 类级别的装饰器
-    ])
-    console.log("isPublic", isPublic)
+    ]);
+    console.log('isPublic', isPublic);
 
     if (isPublic) {
-      return true // 公开路由，直接允许访问
+      return true; // 公开路由，直接允许访问
     }
 
     // 非公开路由，执行 JWT 认证
-    return super.canActivate(context)
+    return super.canActivate(context);
   }
 }

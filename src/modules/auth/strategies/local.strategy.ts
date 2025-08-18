@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common"
-import { PassportStrategy } from "@nestjs/passport"
-import { Strategy } from "passport-local"
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy } from 'passport-local';
 
-import  { AuthService } from "../auth.service"
+import { AuthService } from '../auth.service';
 
 /**
  * 本地认证策略 - 用于用户名密码登录
@@ -12,8 +12,8 @@ import  { AuthService } from "../auth.service"
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super({
-      usernameField: "email", // 使用 email 字段作为用户名（默认是 username）
-    })
+      usernameField: 'email', // 使用 email 字段作为用户名（默认是 username）
+    });
   }
 
   /**
@@ -25,14 +25,14 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
    */
   async validate(email: string, password: string): Promise<any> {
     // 调用认证服务验证用户凭据
-    const user = await this.authService.validateUser(email, password)
+    const user = await this.authService.validateUser(email, password);
 
     if (!user) {
       // 验证失败，抛出未授权异常
-      throw new UnauthorizedException("邮箱或密码错误")
+      throw new UnauthorizedException('邮箱或密码错误');
     }
 
     // 验证成功，返回用户信息（会被注入到 request.user）
-    return user
+    return user;
   }
 }

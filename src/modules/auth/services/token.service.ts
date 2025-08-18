@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common"
-import { JwtService } from "@nestjs/jwt"
-import { ConfigService } from "@nestjs/config"
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * 令牌服务 - 负责 JWT 令牌的生成、验证和解码
@@ -20,9 +20,9 @@ export class TokenService {
    */
   async generateAccessToken(payload: any): Promise<string> {
     return this.jwtService.signAsync(payload, {
-      secret: this.configService.get("JWT_SECRET"), // 访问令牌密钥
-      expiresIn: this.configService.get("JWT_EXPIRES_IN", "15m"), // 默认15分钟过期
-    })
+      secret: this.configService.get('JWT_SECRET'), // 访问令牌密钥
+      expiresIn: this.configService.get('JWT_EXPIRES_IN', '15m'), // 默认15分钟过期
+    });
   }
 
   /**
@@ -32,9 +32,9 @@ export class TokenService {
    */
   async generateRefreshToken(payload: any): Promise<string> {
     return this.jwtService.signAsync(payload, {
-      secret: this.configService.get("JWT_REFRESH_SECRET"), // 刷新令牌密钥（与访问令牌不同）
-      expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN", "7d"), // 默认7天过期
-    })
+      secret: this.configService.get('JWT_REFRESH_SECRET'), // 刷新令牌密钥（与访问令牌不同）
+      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN', '7d'), // 默认7天过期
+    });
   }
 
   /**
@@ -46,8 +46,8 @@ export class TokenService {
    */
   async verifyToken(token: string, secret?: string): Promise<any> {
     return this.jwtService.verifyAsync(token, {
-      secret: secret || this.configService.get("JWT_SECRET"),
-    })
+      secret: secret || this.configService.get('JWT_SECRET'),
+    });
   }
 
   /**
@@ -56,6 +56,6 @@ export class TokenService {
    * @returns 解码后的载荷数据
    */
   async decodeToken(token: string): Promise<any> {
-    return this.jwtService.decode(token)
+    return this.jwtService.decode(token);
   }
 }

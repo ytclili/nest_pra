@@ -1,7 +1,7 @@
-import {  MiddlewareConsumer, Module,  NestModule } from "@nestjs/common"
-import { MetricsService } from "./metrics.service"
-import { MetricsController } from "./metrics.controller"
-import { MetricsMiddleware } from "./metrics.middleware"
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MetricsService } from './metrics.service';
+import { MetricsController } from './metrics.controller';
+import { MetricsMiddleware } from './metrics.middleware';
 
 @Module({
   providers: [MetricsService],
@@ -10,6 +10,6 @@ import { MetricsMiddleware } from "./metrics.middleware"
 })
 export class MetricsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(MetricsMiddleware).forRoutes("*")
+    consumer.apply(MetricsMiddleware).forRoutes('*');
   }
 }

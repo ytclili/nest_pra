@@ -1,7 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common"
-import  { ConfigService } from "@nestjs/config"
-import  { RabbitMQCoreService } from "./rabbitmq-core.service"
-import  { QueueStats } from "../interfaces/rabbitmq.interface"
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { RabbitMQCoreService } from './rabbitmq-core.service';
+import { QueueStats } from '../interfaces/rabbitmq.interface';
 
 /**
  * RabbitMQ 管理服务
@@ -9,7 +9,7 @@ import  { QueueStats } from "../interfaces/rabbitmq.interface"
  */
 @Injectable()
 export class RabbitMQManagementService {
-  private readonly logger = new Logger(RabbitMQManagementService.name)
+  private readonly logger = new Logger(RabbitMQManagementService.name);
 
   constructor(
     private readonly coreService: RabbitMQCoreService,
@@ -24,10 +24,10 @@ export class RabbitMQManagementService {
     // 这里提供基础实现，实际使用时需要调用 Management API
 
     try {
-      const managementUrl = this.configService.get("RABBITMQ_MANAGEMENT_URL")
+      const managementUrl = this.configService.get('RABBITMQ_MANAGEMENT_URL');
       if (!managementUrl) {
-        this.logger.warn("未配置 RabbitMQ Management API URL")
-        return []
+        this.logger.warn('未配置 RabbitMQ Management API URL');
+        return [];
       }
 
       // 这里应该调用 Management API 获取队列信息
@@ -35,10 +35,10 @@ export class RabbitMQManagementService {
       // const queues = await response.json()
 
       // 临时返回空数组
-      return []
+      return [];
     } catch (error) {
-      this.logger.error("获取队列统计信息失败:", error.message)
-      return []
+      this.logger.error('获取队列统计信息失败:', error.message);
+      return [];
     }
   }
 
@@ -47,7 +47,7 @@ export class RabbitMQManagementService {
    */
   async getQueueStats(queueName: string): Promise<QueueStats | null> {
     try {
-      const queueInfo = await this.coreService.getQueueInfo(queueName)
+      const queueInfo = await this.coreService.getQueueInfo(queueName);
 
       return {
         name: queueName,
@@ -55,10 +55,10 @@ export class RabbitMQManagementService {
         consumers: queueInfo.consumerCount,
         messageRate: 0, // 需要通过 Management API 获取
         deliverRate: 0, // 需要通过 Management API 获取
-      }
+      };
     } catch (error) {
-      this.logger.error(`获取队列 ${queueName} 统计信息失败:`, error.message)
-      return null
+      this.logger.error(`获取队列 ${queueName} 统计信息失败:`, error.message);
+      return null;
     }
   }
 
@@ -66,115 +66,122 @@ export class RabbitMQManagementService {
    * 健康检查
    */
   async healthCheck(): Promise<{
-    status: "healthy" | "unhealthy"
-    connection: boolean
-    queues: number
-    errors: string[]
+    status: 'healthy' | 'unhealthy';
+    connection: boolean;
+    queues: number;
+    errors: string[];
   }> {
-    const errors: string[] = []
-    let connection = false
-    let queues = 0
+    const errors: string[] = [];
+    let connection = false;
+    let queues = 0;
 
     try {
       // 检查连接状态
-      connection = this.coreService["connectionService"].isConnectionReady()
+      connection = this.coreService['connectionService'].isConnectionReady();
 
       if (!connection) {
-        errors.push("RabbitMQ 连接不可用")
+        errors.push('RabbitMQ 连接不可用');
       }
 
       // 检查队列数量 (需要 Management API)
-      const queueStats = await this.getAllQueuesStats()
-      queues = queueStats.length
+      const queueStats = await this.getAllQueuesStats();
+      queues = queueStats.length;
     } catch (error) {
-      errors.push(`健康检查失败: ${error.message}`)
+      errors.push(`健康检查失败: ${error.message}`);
     }
 
     return {
-      status: errors.length === 0 ? "healthy" : "unhealthy",
+      status: errors.length === 0 ? 'healthy' : 'unhealthy',
       connection,
       queues,
       errors,
-    }
+    };
   }
 
   /**
    * 清理空队列
    */
   async cleanupEmptyQueues(queueNames: string[]): Promise<{
-    cleaned: string[]
-    errors: string[]
+    cleaned: string[];
+    errors: string[];
   }> {
-    const cleaned: string[] = []
-    const errors: string[] = []
+    const cleaned: string[] = [];
+    const errors: string[] = [];
 
     for (const queueName of queueNames) {
       try {
-        const queueInfo = await this.coreService.getQueueInfo(queueName)
+        const queueInfo = await this.coreService.getQueueInfo(queueName);
 
         if (queueInfo.messageCount === 0 && queueInfo.consumerCount === 0) {
-          await this.coreService.deleteQueue(queueName, { ifEmpty: true })
-          cleaned.push(queueName)
+          await this.coreService.deleteQueue(queueName, { ifEmpty: true });
+          cleaned.push(queueName);
         }
       } catch (error) {
-        errors.push(`清理队列 ${queueName} 失败: ${error.message}`)
+        errors.push(`清理队列 ${queueName} 失败: ${error.message}`);
       }
     }
 
-    this.logger.log(`清理完成: ${cleaned.length} 个队列已删除`)
+    this.logger.log(`清理完成: ${cleaned.length} 个队列已删除`);
 
-    return { cleaned, errors }
+    return { cleaned, errors };
   }
 
   /**
    * 批量清空队列
    */
   async purgeQueues(queueNames: string[]): Promise<{
-    purged: string[]
-    errors: string[]
+    purged: string[];
+    errors: string[];
   }> {
-    const purged: string[] = []
-    const errors: string[] = []
+    const purged: string[] = [];
+    const errors: string[] = [];
 
     for (const queueName of queueNames) {
       try {
-        await this.coreService.purgeQueue(queueName)
-        purged.push(queueName)
+        await this.coreService.purgeQueue(queueName);
+        purged.push(queueName);
       } catch (error) {
-        errors.push(`清空队列 ${queueName} 失败: ${error.message}`)
+        errors.push(`清空队列 ${queueName} 失败: ${error.message}`);
       }
     }
 
-    this.logger.log(`批量清空完成: ${purged.length} 个队列已清空`)
+    this.logger.log(`批量清空完成: ${purged.length} 个队列已清空`);
 
-    return { purged, errors }
+    return { purged, errors };
   }
 
   /**
    * 获取系统概览
    */
   async getSystemOverview(): Promise<{
-    totalQueues: number
-    totalMessages: number
-    totalConsumers: number
-    connectionStatus: boolean
-    uptime: number
+    totalQueues: number;
+    totalMessages: number;
+    totalConsumers: number;
+    connectionStatus: boolean;
+    uptime: number;
   }> {
     try {
-      const queueStats = await this.getAllQueuesStats()
-      const totalMessages = queueStats.reduce((sum, queue) => sum + queue.messages, 0)
-      const totalConsumers = queueStats.reduce((sum, queue) => sum + queue.consumers, 0)
+      const queueStats = await this.getAllQueuesStats();
+      const totalMessages = queueStats.reduce(
+        (sum, queue) => sum + queue.messages,
+        0,
+      );
+      const totalConsumers = queueStats.reduce(
+        (sum, queue) => sum + queue.consumers,
+        0,
+      );
 
       return {
         totalQueues: queueStats.length,
         totalMessages,
         totalConsumers,
-        connectionStatus: this.coreService["connectionService"].isConnectionReady(),
+        connectionStatus:
+          this.coreService['connectionService'].isConnectionReady(),
         uptime: process.uptime(),
-      }
+      };
     } catch (error) {
-      this.logger.error("获取系统概览失败:", error.message)
-      throw error
+      this.logger.error('获取系统概览失败:', error.message);
+      throw error;
     }
   }
 }

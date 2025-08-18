@@ -1,6 +1,10 @@
-import { Injectable, type CanActivate, type ExecutionContext } from "@nestjs/common"
-import type { Reflector } from "@nestjs/core"
-import { PERMISSIONS_KEY } from "../decorators/permissions.decorator"
+import {
+  Injectable,
+  type CanActivate,
+  type ExecutionContext,
+} from '@nestjs/common';
+import type { Reflector } from '@nestjs/core';
+import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 
 /**
  * 权限守卫 - 基于用户权限控制访问
@@ -17,19 +21,24 @@ export class PermissionsGuard implements CanActivate {
    */
   canActivate(context: ExecutionContext): boolean {
     // 获取路由或控制器上标记的所需权限
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
-      context.getHandler(), // 方法级别的装饰器
-      context.getClass(), // 类级别的装饰器
-    ])
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [
+        context.getHandler(), // 方法级别的装饰器
+        context.getClass(), // 类级别的装饰器
+      ],
+    );
 
     if (!requiredPermissions) {
-      return true // 没有权限要求，允许访问
+      return true; // 没有权限要求，允许访问
     }
 
     // 从请求中获取用户信息
-    const { user } = context.switchToHttp().getRequest()
+    const { user } = context.switchToHttp().getRequest();
 
     // 检查用户是否拥有所有所需权限
-    return requiredPermissions.every((permission) => user.permissions?.includes(permission))
+    return requiredPermissions.every((permission) =>
+      user.permissions?.includes(permission),
+    );
   }
 }

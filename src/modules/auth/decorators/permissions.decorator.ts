@@ -1,7 +1,7 @@
-import { SetMetadata } from "@nestjs/common"
+import { SetMetadata } from '@nestjs/common';
 
 // 权限元数据键
-export const PERMISSIONS_KEY = "permissions"
+export const PERMISSIONS_KEY = 'permissions';
 
 /**
  * 权限装饰器
@@ -14,4 +14,5 @@ export const PERMISSIONS_KEY = "permissions"
  *   return { message: '需要用户读写权限' }
  * }
  */
-export const RequirePermissions = (...permissions: string[]) => SetMetadata(PERMISSIONS_KEY, permissions)
+export const RequirePermissions = (...permissions: string[]) =>
+  SetMetadata(PERMISSIONS_KEY, permissions);
